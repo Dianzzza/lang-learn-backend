@@ -3,21 +3,37 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
+require("dotenv").config();
+
+const authRoutes = require("./routes/auth"); // <--- import routes auth
 
 const app = express();
 const port = process.env.PORT || 4000;
 
 app.use(
   cors({
-    origin: "http://localhost:3000", // adres frontendu podczas devu
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
 
+app.use(express.json()); // <--- potrzebne do parsowania JSON z frontend
+
+// --------------------
+// Endpointy auth
+// --------------------
+app.use("/api/auth", authRoutes);
+
+// --------------------
+// Test zdrowia serwera
+// --------------------
 app.get("/health", (req, res) => {
   res.json({ status: "ok", ts: Date.now() });
 });
 
+// --------------------
+// Socket.IO
+// --------------------
 const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
@@ -31,13 +47,10 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
   console.log("New socket connected:", socket.id);
 
-  // przyklad: wysylamy powitanie do klienta
   socket.emit("welcome", { msg: "Witaj z backendu Socket.IO!" });
 
-  // odbieranie eventu od klienta
   socket.on("client:hello", (data) => {
     console.log("client:hello =>", data);
-    // broadcast do wszystkich oprocz zrodla
     socket.broadcast.emit("broadcast:message", {
       from: socket.id,
       text: data.text,
