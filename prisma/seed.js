@@ -1,0 +1,432 @@
+// prisma/seed.js
+const { PrismaClient } = require("@prisma/client");
+
+const prisma = new PrismaClient();
+
+async function main() {
+  const fruits = await prisma.category.upsert({
+    where: { name: "Fruits" },
+    update: {},
+    create: { name: "Fruits" },
+  });
+
+  const animals = await prisma.category.upsert({
+    where: { name: "Animals" },
+    update: {},
+    create: { name: "Animals" },
+  });
+
+  const home = await prisma.category.upsert({
+    where: { name: "Home" },
+    update: {},
+    create: { name: "Home" },
+  });
+
+  await prisma.flashcard.createMany({
+    data: [
+      { front: "apple", back: "jabłko", isGlobal: true, categoryId: fruits.id },
+      { front: "pear", back: "gruszka", isGlobal: true, categoryId: fruits.id },
+      { front: "banana", back: "banan", isGlobal: true, categoryId: fruits.id },
+      {
+        front: "strawberry",
+        back: "truskawka",
+        isGlobal: true,
+        categoryId: fruits.id,
+      },
+      {
+        front: "orange",
+        back: "pomarańcza",
+        isGlobal: true,
+        categoryId: fruits.id,
+      },
+      {
+        front: "grape",
+        back: "winogrono",
+        isGlobal: true,
+        categoryId: fruits.id,
+      },
+      {
+        front: "lemon",
+        back: "cytryna",
+        isGlobal: true,
+        categoryId: fruits.id,
+      },
+      {
+        front: "peach",
+        back: "brzoskwinia",
+        isGlobal: true,
+        categoryId: fruits.id,
+      },
+      { front: "plum", back: "śliwka", isGlobal: true, categoryId: fruits.id },
+      {
+        front: "watermelon",
+        back: "arbuz",
+        isGlobal: true,
+        categoryId: fruits.id,
+      },
+
+      { front: "cat", back: "kot", isGlobal: true, categoryId: animals.id },
+      { front: "dog", back: "pies", isGlobal: true, categoryId: animals.id },
+      { front: "cow", back: "krowa", isGlobal: true, categoryId: animals.id },
+      { front: "horse", back: "koń", isGlobal: true, categoryId: animals.id },
+      { front: "sheep", back: "owca", isGlobal: true, categoryId: animals.id },
+      { front: "pig", back: "świnia", isGlobal: true, categoryId: animals.id },
+      {
+        front: "chicken",
+        back: "kurczak / kura",
+        isGlobal: true,
+        categoryId: animals.id,
+      },
+      { front: "duck", back: "kaczka", isGlobal: true, categoryId: animals.id },
+      { front: "bird", back: "ptak", isGlobal: true, categoryId: animals.id },
+      { front: "fish", back: "ryba", isGlobal: true, categoryId: animals.id },
+
+      { front: "chair", back: "krzesło", isGlobal: true, categoryId: home.id },
+      { front: "table", back: "stół", isGlobal: true, categoryId: home.id },
+      { front: "bed", back: "łóżko", isGlobal: true, categoryId: home.id },
+      { front: "door", back: "drzwi", isGlobal: true, categoryId: home.id },
+      { front: "window", back: "okno", isGlobal: true, categoryId: home.id },
+      {
+        front: "sofa",
+        back: "sofa / kanapa",
+        isGlobal: true,
+        categoryId: home.id,
+      },
+      { front: "lamp", back: "lampa", isGlobal: true, categoryId: home.id },
+      { front: "floor", back: "podłoga", isGlobal: true, categoryId: home.id },
+      { front: "ceiling", back: "sufit", isGlobal: true, categoryId: home.id },
+      {
+        front: "kitchen",
+        back: "kuchnia",
+        isGlobal: true,
+        categoryId: home.id,
+      },
+    ],
+    skipDuplicates: true,
+  });
+
+  await prisma.quiz.createMany({
+    data: [
+      {
+        categoryId: fruits.id,
+        question: "I am eating an ______ for breakfast.",
+        correctWord: "apple",
+      },
+      {
+        categoryId: fruits.id,
+        question: "She bought a ripe ______ at the market.",
+        correctWord: "banana",
+      },
+      {
+        categoryId: fruits.id,
+        question: "He squeezed a fresh ______ to make juice.",
+        correctWord: "orange",
+      },
+      {
+        categoryId: fruits.id,
+        question: "There is a slice of ______ on the plate.",
+        correctWord: "watermelon",
+      },
+      {
+        categoryId: fruits.id,
+        question: "I put a green ______ in my lunch box.",
+        correctWord: "pear",
+      },
+      {
+        categoryId: fruits.id,
+        question: "We picked a sweet ______ from the tree.",
+        correctWord: "peach",
+      },
+      {
+        categoryId: fruits.id,
+        question: "She ate a sour ______ with tea.",
+        correctWord: "lemon",
+      },
+      {
+        categoryId: fruits.id,
+        question: "He loves purple ______ in his dessert.",
+        correctWord: "grape",
+      },
+      {
+        categoryId: fruits.id,
+        question: "I have a small ______ in my hand.",
+        correctWord: "plum",
+      },
+      {
+        categoryId: fruits.id,
+        question: "We shared a bowl of ______ ice cream.",
+        correctWord: "strawberry",
+      },
+
+      {
+        categoryId: animals.id,
+        question: "The ______ is barking loudly.",
+        correctWord: "dog",
+      },
+      {
+        categoryId: animals.id,
+        question: "The ______ is sleeping on the sofa.",
+        correctWord: "cat",
+      },
+      {
+        categoryId: animals.id,
+        question: "The farmer is milking the ______.",
+        correctWord: "cow",
+      },
+      {
+        categoryId: animals.id,
+        question: "He is riding a ______ in the countryside.",
+        correctWord: "horse",
+      },
+      {
+        categoryId: animals.id,
+        question: "A flock of ______ is walking in the field.",
+        correctWord: "sheep",
+      },
+      {
+        categoryId: animals.id,
+        question: "There is a pink ______ in the farmyard.",
+        correctWord: "pig",
+      },
+      {
+        categoryId: animals.id,
+        question: "The ______ is laying an egg.",
+        correctWord: "chicken",
+      },
+      {
+        categoryId: animals.id,
+        question: "The ______ is swimming on the pond.",
+        correctWord: "duck",
+      },
+      {
+        categoryId: animals.id,
+        question: "A small ______ is sitting on the tree.",
+        correctWord: "bird",
+      },
+      {
+        categoryId: animals.id,
+        question: "The ______ is swimming in the aquarium.",
+        correctWord: "fish",
+      },
+
+      {
+        categoryId: home.id,
+        question: "She is sitting on a ______.",
+        correctWord: "chair",
+      },
+      {
+        categoryId: home.id,
+        question: "I put the book on the ______.",
+        correctWord: "table",
+      },
+      {
+        categoryId: home.id,
+        question: "I am going to sleep in my ______.",
+        correctWord: "bed",
+      },
+      {
+        categoryId: home.id,
+        question: "Please open the ______.",
+        correctWord: "door",
+      },
+      {
+        categoryId: home.id,
+        question: "The ______ is open and fresh air is coming in.",
+        correctWord: "window",
+      },
+      {
+        categoryId: home.id,
+        question: "We are watching TV on the ______.",
+        correctWord: "sofa",
+      },
+      {
+        categoryId: home.id,
+        question: "I turned on the ______ to read a book.",
+        correctWord: "lamp",
+      },
+      {
+        categoryId: home.id,
+        question: "The ball is rolling on the ______.",
+        correctWord: "floor",
+      },
+      {
+        categoryId: home.id,
+        question: "There is a spider on the ______.",
+        correctWord: "ceiling",
+      },
+      {
+        categoryId: home.id,
+        question: "I am cooking dinner in the ______.",
+        correctWord: "kitchen",
+      },
+    ],
+  });
+
+  await prisma.testTemplate.createMany({
+    data: [
+      {
+        categoryId: fruits.id,
+        sentence: "There is a red ______ on the plate.",
+        answer: "apple",
+      },
+      {
+        categoryId: fruits.id,
+        sentence: "Monkeys love to eat a ______.",
+        answer: "banana",
+      },
+      {
+        categoryId: fruits.id,
+        sentence: "He peeled an ______ and ate it.",
+        answer: "orange",
+      },
+      {
+        categoryId: fruits.id,
+        sentence: "They cut the big ______ into slices.",
+        answer: "watermelon",
+      },
+      {
+        categoryId: fruits.id,
+        sentence: "She is eating a juicy ______.",
+        answer: "pear",
+      },
+      {
+        categoryId: fruits.id,
+        sentence: "We bought a sweet ______ at the shop.",
+        answer: "peach",
+      },
+      {
+        categoryId: fruits.id,
+        sentence: "He put a slice of ______ in his tea.",
+        answer: "lemon",
+      },
+      {
+        categoryId: fruits.id,
+        sentence: "She is washing a bunch of ______.",
+        answer: "grapes",
+      },
+      {
+        categoryId: fruits.id,
+        sentence: "I picked a small ______ from the tree.",
+        answer: "plum",
+      },
+      {
+        categoryId: fruits.id,
+        sentence: "We made a cake with fresh ______.",
+        answer: "strawberries",
+      },
+
+      {
+        categoryId: animals.id,
+        sentence: "The ______ is playing with a ball.",
+        answer: "dog",
+      },
+      {
+        categoryId: animals.id,
+        sentence: "The ______ is hiding under the bed.",
+        answer: "cat",
+      },
+      {
+        categoryId: animals.id,
+        sentence: "The ______ is eating grass in the field.",
+        answer: "cow",
+      },
+      {
+        categoryId: animals.id,
+        sentence: "He is brushing his ______ every morning.",
+        answer: "horse",
+      },
+      {
+        categoryId: animals.id,
+        sentence: "A group of ______ is moving together.",
+        answer: "sheep",
+      },
+      {
+        categoryId: animals.id,
+        sentence: "The ______ is sleeping in the mud.",
+        answer: "pig",
+      },
+      {
+        categoryId: animals.id,
+        sentence: "The ______ is running around the yard.",
+        answer: "chicken",
+      },
+      {
+        categoryId: animals.id,
+        sentence: "The ______ is walking to the pond.",
+        answer: "duck",
+      },
+      {
+        categoryId: animals.id,
+        sentence: "The ______ is singing in the morning.",
+        answer: "bird",
+      },
+      {
+        categoryId: animals.id,
+        sentence: "The ______ is swimming in the river.",
+        answer: "fish",
+      },
+
+      {
+        categoryId: home.id,
+        sentence: "I am sitting on a ______ at the desk.",
+        answer: "chair",
+      },
+      {
+        categoryId: home.id,
+        sentence: "Dinner is on the ______.",
+        answer: "table",
+      },
+      {
+        categoryId: home.id,
+        sentence: "I am lying on my ______.",
+        answer: "bed",
+      },
+      {
+        categoryId: home.id,
+        sentence: "Someone is knocking at the ______.",
+        answer: "door",
+      },
+      {
+        categoryId: home.id,
+        sentence: "The ______ is closed because it is cold outside.",
+        answer: "window",
+      },
+      {
+        categoryId: home.id,
+        sentence: "We are sitting on the ______ and talking.",
+        answer: "sofa",
+      },
+      {
+        categoryId: home.id,
+        sentence: "The ______ is on the desk.",
+        answer: "lamp",
+      },
+      {
+        categoryId: home.id,
+        sentence: "The children are playing on the ______.",
+        answer: "floor",
+      },
+      {
+        categoryId: home.id,
+        sentence: "There is a light on the ______.",
+        answer: "ceiling",
+      },
+      {
+        categoryId: home.id,
+        sentence: "I am making breakfast in the ______.",
+        answer: "kitchen",
+      },
+    ],
+  });
+
+  console.log("Seeding finished.");
+}
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    prisma.$disconnect();
+  });
