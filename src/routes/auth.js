@@ -167,7 +167,7 @@ router.post("/reset-password", async (req, res) => {
 router.get("/users/me", async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
-    
+
     if (!token) {
       return res.status(401).json({ message: "Brak tokena autentykacji" });
     }
@@ -180,7 +180,7 @@ router.get("/users/me", async (req, res) => {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: payload.id }
+      where: { id: payload.id },
     });
 
     if (!user) {
@@ -211,7 +211,7 @@ router.get("/users/:userId/stats", async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     const userId = parseInt(req.params.userId);
-    
+
     if (!token) {
       return res.status(401).json({ message: "Brak tokena autentykacji" });
     }
@@ -224,11 +224,13 @@ router.get("/users/:userId/stats", async (req, res) => {
 
     // Pobierz statystyki z bazy
     const stats = await prisma.userStats.findUnique({
-      where: { userId }
+      where: { userId },
     });
 
     if (!stats) {
-      return res.status(404).json({ message: "Brak statystyk dla użytkownika" });
+      return res
+        .status(404)
+        .json({ message: "Brak statystyk dla użytkownika" });
     }
 
     res.json({
@@ -260,7 +262,7 @@ router.get("/users/:userId/courses", async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     const userId = parseInt(req.params.userId);
-    
+
     if (!token) {
       return res.status(401).json({ message: "Brak tokena autentykacji" });
     }
@@ -275,14 +277,14 @@ router.get("/users/:userId/courses", async (req, res) => {
     const userCourses = await prisma.userCourse.findMany({
       where: {
         userId,
-        isActive: true
+        isActive: true,
       },
       include: {
-        course: true
-      }
+        course: true,
+      },
     });
 
-    const courses = userCourses.map(uc => ({
+    const courses = userCourses.map((uc) => ({
       id: uc.course.id,
       title: uc.course.title,
       level: uc.course.level,
@@ -297,7 +299,7 @@ router.get("/users/:userId/courses", async (req, res) => {
       category: uc.course.category,
       emoji: uc.course.emoji,
       color: uc.course.color,
-      isActive: uc.isActive
+      isActive: uc.isActive,
     }));
 
     res.json(courses);
@@ -315,7 +317,7 @@ router.get("/users/:userId/activity", async (req, res) => {
     const token = req.headers.authorization?.split(" ")[1];
     const userId = parseInt(req.params.userId);
     const limit = parseInt(req.query.limit) || 10;
-    
+
     if (!token) {
       return res.status(401).json({ message: "Brak tokena autentykacji" });
     }
@@ -329,8 +331,8 @@ router.get("/users/:userId/activity", async (req, res) => {
     // Pobierz aktywność z bazy
     const activities = await prisma.userActivity.findMany({
       where: { userId },
-      orderBy: { createdAt: 'desc' },
-      take: limit
+      orderBy: { createdAt: "desc" },
+      take: limit,
     });
 
     res.json(activities);
@@ -347,7 +349,7 @@ router.put("/users/me/update", async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     const { displayName, bio, avatar } = req.body;
-    
+
     if (!token) {
       return res.status(401).json({ message: "Brak tokena autentykacji" });
     }
@@ -375,12 +377,12 @@ router.put("/users/me/update", async (req, res) => {
         bio: true,
         avatar: true,
         createdAt: true,
-      }
+      },
     });
 
     res.json({
       message: "Profil zaktualizowany pomyślnie",
-      user: updatedUser
+      user: updatedUser,
     });
   } catch (err) {
     console.error(err);
@@ -395,13 +397,15 @@ router.put("/users/me/password", async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     const { currentPassword, newPassword } = req.body;
-    
+
     if (!token || !currentPassword || !newPassword) {
       return res.status(400).json({ message: "Wszystkie pola są wymagane" });
     }
 
     if (newPassword.length < 6) {
-      return res.status(400).json({ message: "Nowe hasło musi mieć co najmniej 6 znaków" });
+      return res
+        .status(400)
+        .json({ message: "Nowe hasło musi mieć co najmniej 6 znaków" });
     }
 
     let payload;
@@ -413,7 +417,7 @@ router.put("/users/me/password", async (req, res) => {
 
     // Pobierz użytkownika z bazy
     const user = await prisma.user.findUnique({
-      where: { id: payload.id }
+      where: { id: payload.id },
     });
 
     if (!user) {
@@ -423,7 +427,9 @@ router.put("/users/me/password", async (req, res) => {
     // Sprawdzenie czy stare hasło jest prawidłowe
     const validPassword = await bcrypt.compare(currentPassword, user.password);
     if (!validPassword) {
-      return res.status(400).json({ message: "Bieżące hasło jest nieprawidłowe" });
+      return res
+        .status(400)
+        .json({ message: "Bieżące hasło jest nieprawidłowe" });
     }
 
     // Hashuj nowe hasło
@@ -432,7 +438,7 @@ router.put("/users/me/password", async (req, res) => {
     // Zaktualizuj hasło
     await prisma.user.update({
       where: { id: user.id },
-      data: { password: hashedPassword }
+      data: { password: hashedPassword },
     });
 
     res.json({ message: "Hasło zmienione pomyślnie" });
@@ -449,7 +455,7 @@ router.get("/users/:userId/settings", async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     const userId = parseInt(req.params.userId);
-    
+
     if (!token) {
       return res.status(401).json({ message: "Brak tokena autentykacji" });
     }
@@ -462,13 +468,13 @@ router.get("/users/:userId/settings", async (req, res) => {
 
     // Pobierz ustawienia użytkownika
     let settings = await prisma.userSettings.findUnique({
-      where: { userId }
+      where: { userId },
     });
 
     // Jeśli ustawienia nie istnieją, utwórz domyślne
     if (!settings) {
       settings = await prisma.userSettings.create({
-        data: { userId }
+        data: { userId },
       });
     }
 
@@ -486,8 +492,15 @@ router.put("/users/:userId/settings", async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     const userId = parseInt(req.params.userId);
-    const { dailyGoal, difficulty, notificationsEnabled, emailNotifications, profilePublic, showStats } = req.body;
-    
+    const {
+      dailyGoal,
+      difficulty,
+      notificationsEnabled,
+      emailNotifications,
+      profilePublic,
+      showStats,
+    } = req.body;
+
     if (!token) {
       return res.status(401).json({ message: "Brak tokena autentykacji" });
     }
@@ -500,7 +513,7 @@ router.put("/users/:userId/settings", async (req, res) => {
 
     // Najpierw sprawdź czy ustawienia istnieją
     let settings = await prisma.userSettings.findUnique({
-      where: { userId }
+      where: { userId },
     });
 
     if (!settings) {
@@ -510,11 +523,13 @@ router.put("/users/:userId/settings", async (req, res) => {
           userId,
           dailyGoal: dailyGoal || 15,
           difficulty: difficulty || "Medium",
-          notificationsEnabled: notificationsEnabled !== undefined ? notificationsEnabled : true,
-          emailNotifications: emailNotifications !== undefined ? emailNotifications : true,
+          notificationsEnabled:
+            notificationsEnabled !== undefined ? notificationsEnabled : true,
+          emailNotifications:
+            emailNotifications !== undefined ? emailNotifications : true,
           profilePublic: profilePublic !== undefined ? profilePublic : true,
           showStats: showStats !== undefined ? showStats : true,
-        }
+        },
       });
     } else {
       // Jeśli istnieją, zaktualizuj
@@ -523,17 +538,26 @@ router.put("/users/:userId/settings", async (req, res) => {
         data: {
           dailyGoal: dailyGoal !== undefined ? dailyGoal : settings.dailyGoal,
           difficulty: difficulty || settings.difficulty,
-          notificationsEnabled: notificationsEnabled !== undefined ? notificationsEnabled : settings.notificationsEnabled,
-          emailNotifications: emailNotifications !== undefined ? emailNotifications : settings.emailNotifications,
-          profilePublic: profilePublic !== undefined ? profilePublic : settings.profilePublic,
+          notificationsEnabled:
+            notificationsEnabled !== undefined
+              ? notificationsEnabled
+              : settings.notificationsEnabled,
+          emailNotifications:
+            emailNotifications !== undefined
+              ? emailNotifications
+              : settings.emailNotifications,
+          profilePublic:
+            profilePublic !== undefined
+              ? profilePublic
+              : settings.profilePublic,
           showStats: showStats !== undefined ? showStats : settings.showStats,
-        }
+        },
       });
     }
 
     res.json({
       message: "Ustawienia zaktualizowane pomyślnie",
-      settings
+      settings,
     });
   } catch (err) {
     console.error(err);
