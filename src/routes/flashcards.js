@@ -47,21 +47,56 @@ router.get("/", authMiddleware, async (req, res) => {
 
     const userId = req.user?.id;
 
-    const where = {
+    const whereBase = {
       categoryId: Number(categoryId),
-      OR: [{ isGlobal: true }],
     };
 
+    const orConditions = [{ isGlobal: true }];
+
     if (includePrivate === "true" && userId) {
-      where.OR.push({ ownerId: userId });
+      orConditions.push({ ownerId: userId });
     }
 
+    // najpierw pobierz fiszki z kategorii (globalne + prywatne użytkownika)
     const flashcards = await prisma.flashcard.findMany({
-      where,
+      where: {
+        ...whereBase,
+        OR: orConditions,
+      },
       orderBy: { id: "asc" },
+      include: {
+        userProgress: userId
+          ? {
+              where: { userId },
+              select: { learned: true, toReview: true },
+            }
+          : false,
+      },
     });
 
-    res.json(flashcards);
+    // odfiltruj fiszki, które są nauczone przez tego usera
+    const filtered = flashcards.filter((card) => {
+      if (!userId) return true;
+      const progress = card.userProgress?.[0];
+      return !(progress && progress.learned);
+    });
+
+    res.json(
+      filtered.map((card) => ({
+        id: card.id,
+        front: card.front,
+        back: card.back,
+        categoryId: card.categoryId,
+        // opcjonalnie możesz dodać status do frontu:
+        status: card.userProgress?.[0]
+          ? card.userProgress[0].learned
+            ? "learned"
+            : card.userProgress[0].toReview
+            ? "repeat"
+            : "none"
+          : "none",
+      }))
+    );
   } catch (err) {
     console.error("GET /api/flashcards error:", err);
     res.status(500).json({ error: "Nie udało się pobrać fiszek" });
@@ -157,6 +192,102 @@ router.delete("/:id", authMiddleware, async (req, res) => {
   } catch (err) {
     console.error("DELETE /api/flashcards/:id error:", err);
     res.status(500).json({ message: "Nie udało się usunąć fiszki" });
+  }
+});
+
+// PATCH /api/flashcards/:id/status – ustaw status fiszki dla użytkownika
+router.patch("/:id/status", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const flashcardId = Number(req.params.id);
+    const { status } = req.body; // 'repeat' | 'learned' | 'none'
+
+    if (!["repeat", "learned", "none"].includes(status)) {
+      return res.status(400).json({ message: "Nieprawidłowy status" });
+    }
+
+    // znajdź fiszkę, musi istnieć
+    const flashcard = await prisma.flashcard.findUnique({
+      where: { id: flashcardId },
+    });
+    if (!flashcard) {
+      return res.status(404).json({ message: "Nie znaleziono fiszki" });
+    }
+
+    if (status === "none") {
+      // usuwamy status dla tej fiszki
+      await prisma.userFlashcard.deleteMany({
+        where: { userId, flashcardId },
+      });
+      return res.status(204).send();
+    }
+
+    const learned = status === "learned";
+    const toReview = status === "repeat";
+
+    const existing = await prisma.userFlashcard.findUnique({
+      where: {
+        userId_flashcardId: {
+          userId,
+          flashcardId,
+        },
+      },
+    });
+
+    let result;
+    if (existing) {
+      result = await prisma.userFlashcard.update({
+        where: { id: existing.id },
+        data: { learned, toReview },
+      });
+    } else {
+      result = await prisma.userFlashcard.create({
+        data: {
+          userId,
+          flashcardId,
+          learned,
+          toReview,
+        },
+      });
+    }
+
+    res.json(result);
+  } catch (err) {
+    console.error("PATCH /api/flashcards/:id/status error:", err);
+    res
+      .status(500)
+      .json({ message: "Nie udało się zaktualizować statusu fiszki" });
+  }
+});
+
+// POST /api/flashcards/reset – zresetuj statusy w danej kategorii dla użytkownika
+// body: { categoryId: number }
+router.post("/reset", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { categoryId } = req.body;
+
+    if (!categoryId) {
+      return res
+        .status(400)
+        .json({ message: "Parametr categoryId jest wymagany" });
+    }
+
+    await prisma.userFlashcard.deleteMany({
+      where: {
+        userId,
+        flashcard: {
+          categoryId: Number(categoryId),
+        },
+      },
+    });
+
+    res.status(204).send();
+  } catch (err) {
+    console.error("POST /api/flashcards/reset error:", err);
+    res
+      .status(500)
+      .json({ message: "Nie udało się zresetować statusów fiszek" });
   }
 });
 
