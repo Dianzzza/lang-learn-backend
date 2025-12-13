@@ -291,4 +291,43 @@ router.post("/reset", authMiddleware, async (req, res) => {
   }
 });
 
+// GET /api/flashcards/stats?categoryId=1
+router.get("/stats", authMiddleware, async (req, res) => {
+  try {
+    const { categoryId } = req.query;
+    const userId = req.user.id;
+
+    if (!categoryId) {
+      return res
+        .status(400)
+        .json({ message: "Parametr categoryId jest wymagany" });
+    }
+
+    // globalne + prywatne aktualnego użytkownika
+    const totalCards = await prisma.flashcard.count({
+      where: {
+        categoryId: Number(categoryId),
+        OR: [{ isGlobal: true }, { ownerId: userId }],
+      },
+    });
+
+    const uniqueUsersRaw = await prisma.userFlashcard.findMany({
+      where: {
+        flashcard: {
+          categoryId: Number(categoryId),
+        },
+      },
+      select: { userId: true },
+      distinct: ["userId"],
+    });
+
+    const uniqueUsers = uniqueUsersRaw.length;
+
+    res.json({ totalCards, uniqueUsers });
+  } catch (err) {
+    console.error("GET /api/flashcards/stats error:", err);
+    res.status(500).json({ message: "Nie udało się pobrać statystyk fiszek" });
+  }
+});
+
 module.exports = router;
