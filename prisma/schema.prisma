@@ -25,6 +25,9 @@ model User {
   duelsAsPlayer1 Duel[]          @relation("Player1")
   duelsAsPlayer2 Duel[]          @relation("Player2")
   duelsWon       Duel[]          @relation("Winner")
+
+  quizAttempts QuizAttempt[]
+
 }
 
 /// Kategorie (owoce, zwierzęta, itd.)
@@ -70,21 +73,44 @@ model Quiz {
   id          Int       @id @default(autoincrement())
   categoryId  Int?
   category    Category? @relation(fields: [categoryId], references: [id])
-  question    String    // zdanie z brakującym słowem
-  correctWord String    // poprawna odpowiedź
+  question    String
+  correctWord String
+  polishWord  String?
   createdAt   DateTime  @default(now())
+
+  @@unique([categoryId, question])
 }
+
+// Zapis podejścia do Quizu
+model QuizAttempt {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  categoryId  Int
+  difficulty  String   // "easy" | "medium" | "hard"
+  score       Int
+  maxScore    Int
+  durationSec Int?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([categoryId, createdAt])
+}
+
 
 /// Szablon testu (wpisywanie słowa przez użytkownika)
 model TestTemplate {
   id          Int       @id @default(autoincrement())
   categoryId  Int?
   category    Category? @relation(fields: [categoryId], references: [id])
-  sentence    String    // zdanie z brakującym słowem
-  answer      String    // poprawna odpowiedź
+  sentence    String
+  answer      String
   createdAt   DateTime  @default(now())
 
   tests       Test[]
+
+  @@unique([categoryId, sentence])
 }
 
 /// Wykonany test przez użytkownika
