@@ -8,6 +8,7 @@ require("dotenv").config();
 const authRoutes = require("./routes/auth"); // <--- import routes auth
 const categoriesRoutes = require("./routes/categories");
 const flashcardsRoutes = require("./routes/flashcards");
+const quizzesRoutes = require("./routes/quizzes");
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -29,6 +30,9 @@ app.use("/api/auth", authRoutes);
 // Kategorie i fiszki
 app.use("/api/categories", categoriesRoutes);
 app.use("/api/flashcards", flashcardsRoutes);
+
+// Quizy
+app.use("/api/quizzes", quizzesRoutes);
 
 // --------------------
 // Test zdrowia serwera
