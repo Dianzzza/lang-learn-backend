@@ -9,6 +9,8 @@ const authRoutes = require("./routes/auth"); // <--- import routes auth
 const categoriesRoutes = require("./routes/categories");
 const flashcardsRoutes = require("./routes/flashcards");
 const quizzesRoutes = require("./routes/quizzes");
+//const { test } = require("./prismaClient");
+const testsRoutes = require("./routes/tests");
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -33,6 +35,9 @@ app.use("/api/flashcards", flashcardsRoutes);
 
 // Quizy
 app.use("/api/quizzes", quizzesRoutes);
+
+//Testy
+app.use("/api/tests", testsRoutes);
 
 // --------------------
 // Test zdrowia serwera
