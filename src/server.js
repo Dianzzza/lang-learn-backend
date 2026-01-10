@@ -6,6 +6,8 @@ const cors = require("cors");
 require("dotenv").config();
 
 const authRoutes = require("./routes/auth"); // <--- import routes auth
+const categoriesRoutes = require("./routes/categories");
+const flashcardsRoutes = require("./routes/flashcards");
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -23,6 +25,10 @@ app.use(express.json()); // <--- potrzebne do parsowania JSON z frontend
 // Endpointy auth
 // --------------------
 app.use("/api/auth", authRoutes);
+
+// Kategorie i fiszki
+app.use("/api/categories", categoriesRoutes);
+app.use("/api/flashcards", flashcardsRoutes);
 
 // --------------------
 // Test zdrowia serwera
