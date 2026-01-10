@@ -51,6 +51,8 @@ model Flashcard {
   category     Category?        @relation(fields: [categoryId], references: [id])
   createdAt    DateTime         @default(now())
   userProgress UserFlashcard[]
+
+  @@unique([front, ownerId])
 }
 
 /// Stan nauki fiszek dla użytkownika
@@ -106,6 +108,7 @@ model TestTemplate {
   category    Category? @relation(fields: [categoryId], references: [id])
   sentence    String
   answer      String
+  polishWord  String?   // NOWE
   createdAt   DateTime  @default(now())
 
   tests       Test[]

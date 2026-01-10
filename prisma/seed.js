@@ -315,147 +315,190 @@ async function main() {
   // TEST TEMPLATES (bez duplikatów) - wymaga @@unique([categoryId, sentence])
   // =========================
   const templates = [
+    // FRUITS
     {
       categoryId: fruits.id,
       sentence: "There is a red ______ on the plate.",
       answer: "apple",
+      polishWord: "jabłko",
     },
     {
       categoryId: fruits.id,
       sentence: "Monkeys love to eat a ______.",
       answer: "banana",
+      polishWord: "banan",
     },
     {
       categoryId: fruits.id,
       sentence: "He peeled an ______ and ate it.",
       answer: "orange",
+      polishWord: "pomarańcza",
     },
     {
       categoryId: fruits.id,
       sentence: "They cut the big ______ into slices.",
       answer: "watermelon",
+      polishWord: "arbuz",
     },
     {
       categoryId: fruits.id,
       sentence: "She is eating a juicy ______.",
       answer: "pear",
+      polishWord: "gruszka",
     },
     {
       categoryId: fruits.id,
       sentence: "We bought a sweet ______ at the shop.",
       answer: "peach",
+      polishWord: "brzoskwinia",
     },
     {
       categoryId: fruits.id,
       sentence: "He put a slice of ______ in his tea.",
       answer: "lemon",
+      polishWord: "cytryna",
+    },
+    {
+      categoryId: fruits.id,
+      sentence: "She is washing a bunch of ______.",
+      answer: "grapes",
+      polishWord: "winogrona",
     },
     {
       categoryId: fruits.id,
       sentence: "I picked a small ______ from the tree.",
       answer: "plum",
+      polishWord: "śliwka",
     },
     {
       categoryId: fruits.id,
       sentence: "We made a cake with fresh ______.",
       answer: "strawberries",
+      polishWord: "truskawki",
     },
 
+    // ANIMALS
     {
       categoryId: animals.id,
       sentence: "The ______ is playing with a ball.",
       answer: "dog",
+      polishWord: "pies",
     },
     {
       categoryId: animals.id,
       sentence: "The ______ is hiding under the bed.",
       answer: "cat",
+      polishWord: "kot",
     },
     {
       categoryId: animals.id,
       sentence: "The ______ is eating grass in the field.",
       answer: "cow",
+      polishWord: "krowa",
     },
     {
       categoryId: animals.id,
       sentence: "He is brushing his ______ every morning.",
       answer: "horse",
+      polishWord: "koń",
     },
     {
       categoryId: animals.id,
       sentence: "A group of ______ is moving together.",
       answer: "sheep",
+      polishWord: "owce",
     },
     {
       categoryId: animals.id,
       sentence: "The ______ is sleeping in the mud.",
       answer: "pig",
+      polishWord: "świnia",
     },
     {
       categoryId: animals.id,
       sentence: "The ______ is walking to the pond.",
       answer: "duck",
+      polishWord: "kaczka",
+    },
+    {
+      categoryId: animals.id,
+      sentence: "The ______ is running around the yard.",
+      answer: "chicken",
+      polishWord: "kurczak / kura",
     },
     {
       categoryId: animals.id,
       sentence: "The ______ is singing in the morning.",
       answer: "bird",
+      polishWord: "ptak",
     },
     {
       categoryId: animals.id,
       sentence: "The ______ is swimming in the river.",
       answer: "fish",
+      polishWord: "ryba",
     },
 
+    // HOME
     {
       categoryId: home.id,
       sentence: "I am sitting on a ______ at the desk.",
       answer: "chair",
+      polishWord: "krzesło",
     },
     {
       categoryId: home.id,
       sentence: "Dinner is on the ______.",
       answer: "table",
+      polishWord: "stół",
     },
     {
       categoryId: home.id,
       sentence: "I am lying on my ______.",
       answer: "bed",
+      polishWord: "łóżko",
     },
     {
       categoryId: home.id,
       sentence: "Someone is knocking at the ______.",
       answer: "door",
+      polishWord: "drzwi",
     },
     {
       categoryId: home.id,
       sentence: "The ______ is closed because it is cold outside.",
       answer: "window",
+      polishWord: "okno",
     },
     {
       categoryId: home.id,
       sentence: "We are sitting on the ______ and talking.",
       answer: "sofa",
+      polishWord: "sofa",
     },
     {
       categoryId: home.id,
       sentence: "The ______ is on the desk.",
       answer: "lamp",
+      polishWord: "lampa",
     },
     {
       categoryId: home.id,
       sentence: "The children are playing on the ______.",
       answer: "floor",
+      polishWord: "podłoga",
     },
     {
       categoryId: home.id,
       sentence: "There is a light on the ______.",
       answer: "ceiling",
+      polishWord: "sufit",
     },
     {
       categoryId: home.id,
       sentence: "I am making breakfast in the ______.",
       answer: "kitchen",
+      polishWord: "kuchnia",
     },
   ];
 
@@ -467,7 +510,7 @@ async function main() {
           sentence: t.sentence,
         },
       },
-      update: { answer: t.answer },
+      update: { answer: t.answer, polishWord: t.polishWord },
       create: t,
     });
   }
